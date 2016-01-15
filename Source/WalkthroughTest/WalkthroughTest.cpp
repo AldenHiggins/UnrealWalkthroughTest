@@ -4,4 +4,7 @@
 
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, WalkthroughTest, "WalkthroughTest" );
+
+//General Log
+DEFINE_LOG_CATEGORY(Kilograph);
  
