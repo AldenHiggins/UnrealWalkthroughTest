@@ -17,12 +17,16 @@ public:
 	AWalkthroughTestCharacter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Camera)
 	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Camera)
 	float BaseLookUpRate;
+
+	// Scales the movement of the player
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	float MoveSpeed;
 
 protected:
 	/** Handles moving forward/backward */
@@ -30,6 +34,7 @@ protected:
 
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
+
 
 	/**
 	 * Called via input to turn at a given rate.
