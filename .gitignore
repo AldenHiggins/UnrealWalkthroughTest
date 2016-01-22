@@ -14,3 +14,6 @@ Config/
 Binaries/
 AndroidBuild/
 WindowsBuild/
+Plugins/NewMenu/NewMenu.uplugin
+Plugins/NewMenu/Resources/Icon128.png
+Plugins/NewMenu/Resources/Thumbs.db
