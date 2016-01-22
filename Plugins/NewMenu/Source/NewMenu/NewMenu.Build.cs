@@ -15,8 +15,10 @@ public class NewMenu : ModuleRules
 				"UnrealEd",
 				"Slate",
                 "SlateCore",
-                "ImageWrapper"
-			}
+                "ImageWrapper",
+                "AssetTools",
+                "ContentBrowser"
+            }
 		);
 		//Private Paths
         PrivateIncludePaths.AddRange(new[] { "NewMenu/Private" });
