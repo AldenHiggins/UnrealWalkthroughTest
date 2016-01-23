@@ -1,6 +1,7 @@
 #include "NewMenuEditorModule.h"
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
+//#include "Engine/EngineTypes.h"
 
 IMPLEMENT_MODULE( NewMenuEditorModule, NewMenu );
 
@@ -42,7 +43,7 @@ void NewMenuEditorModule::testMethod(FMenuBuilder& InMenuBarBuilder)
 	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
 	UMaterial *TheMaterial = LoadObject<UMaterial>(NULL, TEXT("/Game/FirstPerson/Materials/FurnitureIcons/ThumbnailMaterial.ThumbnailMaterial"), NULL, LOAD_None, NULL);
 
-	// Create an appropriate and unique name 
+	// Create an appropriate and unique name
 	FString Name;
 	FString PackageName;
 	AssetToolsModule.Get().CreateUniqueAssetName(TheMaterial->GetOutermost()->GetName(), TEXT("_Mat"), PackageName, Name);
@@ -52,54 +53,37 @@ void NewMenuEditorModule::testMethod(FMenuBuilder& InMenuBarBuilder)
 	Factory->InitialParent = CastChecked<UMaterialInterface>(TheMaterial);
 
 	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-	ContentBrowserModule.Get().CreateNewAsset(Name, FPackageName::GetLongPackagePath(PackageName), UMaterialInstanceConstant::StaticClass(), Factory);
+	TArray<FAssetData> selectedAssets;
+	ContentBrowserModule.Get().GetSelectedAssets(selectedAssets);
+
+	UE_LOG(LogTemp, Warning, TEXT("Selected assets size: %d"), selectedAssets.Num());
+
+	if (selectedAssets.Num() > 0)
+	{
+		UTexture* selected = (UTexture *) selectedAssets[0].GetAsset();
+
+		//UObject* selected = selectedAssets[0].GetAsset();
+
+		if (selected->IsNormalMap() == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not normal map"));
+		}
+		FString selectedName = selectedAssets[0].AssetName.ToString();
+		UE_LOG(LogTemp, Warning, TEXT("Name of selected asset: %s"), *selectedName);
+
+		selectedName += "_Mat";
+		UE_LOG(LogTemp, Warning, TEXT("Name of selected asset: %s"), *selectedName);
+
+		FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
+		UObject* NewAsset = AssetToolsModule.Get().CreateAsset(selectedName, FPackageName::GetLongPackagePath(PackageName), UMaterialInstanceConstant::StaticClass(), Factory);
+
+		UMaterialInstanceConstant *newlyCreatedMaterial = (UMaterialInstanceConstant *)NewAsset;
+		UE_LOG(LogTemp, Warning, TEXT("Got here"));
+
+		newlyCreatedMaterial->SetTextureParameterValueEditorOnly("ThumbTexture", selected);
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Finished alden method"));
-	//UMaterial *TheMaterial;
-	//if (MatFinder.Succeeded())
-	//{
-	//	if (MatFinder.Object != NULL)
-	//	{
-	//		TheMaterial = (UMaterial*)MatFinder.Object;
-	//		UE_LOG(LogTemp, Warning, TEXT("Material found"));
-	//	}
-	//}
-	
-
-
-
-	//if (MatFinder.Succeeded())
-	//{
-	//	Material = MatFinder.Object;
-	//	MaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-	//	//Setting a font parameter of a dynamic material instance crashes the game when invoked in a constructor
-	//	//using default font parameter until onconstruction
-	//	//DamageTextMaterialInstance->SetFontParameterValue("Font", DamageTextFont, 0);
-	//	MaterialInstance->SetScalarParameterValue("Glow amount", CurrentGlowAmount);
-	//	MaterialInstance->SetScalarParameterValue("Opacity", CurrentOpacity);
-	//}
-
-
-
-	// Input:	
-	//TArray<TWeakObjectPtr<UMaterialInterface>> Objects
-
-	// Create a material instance from a material
-	////auto Object = Objects[0].Get();
-
-	////if (Object)
-	////{
-	////	// Create an appropriate and unique name 
-	////	FString Name;
-	////	FString PackageName;
-	////	CreateUniqueAssetName(Object->GetOutermost()->GetName(), DefaultSuffix, PackageName, Name);
-
-	////	UMaterialInstanceConstantFactoryNew* Factory = NewObject<UMaterialInstanceConstantFactoryNew>();
-	////	Factory->InitialParent = Object;
-
-	////	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-	////	ContentBrowserModule.Get().CreateNewAsset(Name, FPackageName::GetLongPackagePath(PackageName), UMaterialInstanceConstant::StaticClass(), Factory);
-	////}
 }
 
 
