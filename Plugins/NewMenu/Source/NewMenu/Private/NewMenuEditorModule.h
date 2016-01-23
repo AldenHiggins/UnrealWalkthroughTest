@@ -20,4 +20,6 @@ public:
 	static void OnCreateNewMenu( FMenuBarBuilder& InMenuBarBuilder );
 
 	static void createThumbnailMaterialInstance(FMenuBuilder& InMenuBarBuilder);
+
+	static void createThumbnailMaterialInstance(FMenuBuilder& InMenuBarBuilder);
 };

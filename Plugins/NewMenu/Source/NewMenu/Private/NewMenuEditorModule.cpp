@@ -35,6 +35,31 @@ void NewMenuEditorModule::OnCreateNewMenu( FMenuBarBuilder& InMenuBarBuilder )
 		LOCTEXT( "NewMenuEditorTooltip", "Generate a new thumbnail material from the selected texture." ),
 		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::createThumbnailMaterialInstance)
 	);
+
+	InMenuBarBuilder.AddPullDownMenu
+	(
+		LOCTEXT("NewMenuEditor", "Material Color Change"),
+		LOCTEXT("NewMenuEditorTooltip", "Prepare material to have it's color changed"),
+		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::colorChangeMaterial)
+	);
+}
+
+
+void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
+{
+	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+	TArray<FAssetData> selectedAssets;
+	ContentBrowserModule.Get().GetSelectedAssets(selectedAssets);
+
+	if (selectedAssets.Num() == 0)
+	{
+		return;
+	}
+
+	// Get the selected material
+	UMaterial* selected = (UMaterial *)selectedAssets[0].GetAsset();
+
+
 }
 
 void NewMenuEditorModule::createThumbnailMaterialInstance(FMenuBuilder& InMenuBarBuilder)
