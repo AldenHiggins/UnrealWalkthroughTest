@@ -19,5 +19,5 @@ public:
 	void CreateNewMenu();
 	static void OnCreateNewMenu( FMenuBarBuilder& InMenuBarBuilder );
 
-	static void testMethod(FMenuBuilder& InMenuBarBuilder);
+	static void createThumbnailMaterialInstance(FMenuBuilder& InMenuBarBuilder);
 };

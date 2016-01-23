@@ -31,59 +31,44 @@ void NewMenuEditorModule::OnCreateNewMenu( FMenuBarBuilder& InMenuBarBuilder )
 {
 	InMenuBarBuilder.AddPullDownMenu
 	(
-		LOCTEXT( "NewMenuEditor", "Alden Action" ),
-		LOCTEXT( "NewMenuEditorTooltip", "Should do something cool?" ),
-		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::testMethod)
+		LOCTEXT( "NewMenuEditor", "Create Thumb Mat" ),
+		LOCTEXT( "NewMenuEditorTooltip", "Generate a new thumbnail material from the selected texture." ),
+		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::createThumbnailMaterialInstance)
 	);
 }
 
-void NewMenuEditorModule::testMethod(FMenuBuilder& InMenuBarBuilder)
+void NewMenuEditorModule::createThumbnailMaterialInstance(FMenuBuilder& InMenuBarBuilder)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Started alden method"));
-	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
-	UMaterial *TheMaterial = LoadObject<UMaterial>(NULL, TEXT("/Game/FirstPerson/Materials/FurnitureIcons/ThumbnailMaterial.ThumbnailMaterial"), NULL, LOAD_None, NULL);
-
-	// Create an appropriate and unique name
-	FString Name;
-	FString PackageName;
-	AssetToolsModule.Get().CreateUniqueAssetName(TheMaterial->GetOutermost()->GetName(), TEXT("_Mat"), PackageName, Name);
-	UE_LOG(LogTemp, Warning, TEXT("New material name: %s and packageName: %s"), *Name, *PackageName);
-
-	UMaterialInstanceConstantFactoryNew* Factory = NewObject<UMaterialInstanceConstantFactoryNew>();
-	Factory->InitialParent = CastChecked<UMaterialInterface>(TheMaterial);
-
 	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
 	TArray<FAssetData> selectedAssets;
 	ContentBrowserModule.Get().GetSelectedAssets(selectedAssets);
 
-	UE_LOG(LogTemp, Warning, TEXT("Selected assets size: %d"), selectedAssets.Num());
-
-	if (selectedAssets.Num() > 0)
+	if (selectedAssets.Num() == 0)
 	{
-		UTexture* selected = (UTexture *) selectedAssets[0].GetAsset();
-
-		//UObject* selected = selectedAssets[0].GetAsset();
-
-		if (selected->IsNormalMap() == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not normal map"));
-		}
-		FString selectedName = selectedAssets[0].AssetName.ToString();
-		UE_LOG(LogTemp, Warning, TEXT("Name of selected asset: %s"), *selectedName);
-
-		selectedName += "_Mat";
-		UE_LOG(LogTemp, Warning, TEXT("Name of selected asset: %s"), *selectedName);
-
-		FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
-		UObject* NewAsset = AssetToolsModule.Get().CreateAsset(selectedName, FPackageName::GetLongPackagePath(PackageName), UMaterialInstanceConstant::StaticClass(), Factory);
-
-		UMaterialInstanceConstant *newlyCreatedMaterial = (UMaterialInstanceConstant *)NewAsset;
-		UE_LOG(LogTemp, Warning, TEXT("Got here"));
-
-		newlyCreatedMaterial->SetTextureParameterValueEditorOnly("ThumbTexture", selected);
+		return;
 	}
+	
+	// Get the thumbnail material that we will create an instance of
+	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
+	UMaterial *TheMaterial = LoadObject<UMaterial>(NULL, TEXT("/Game/FirstPerson/Materials/FurnitureIcons/ThumbnailMaterial.ThumbnailMaterial"), NULL, LOAD_None, NULL);
 
-	UE_LOG(LogTemp, Warning, TEXT("Finished alden method"));
+	// Get the package name of the thumbnail material
+	FString Name;
+	FString PackageName;
+	AssetToolsModule.Get().CreateUniqueAssetName(TheMaterial->GetOutermost()->GetName(), TEXT("_Mat"), PackageName, Name);
+	
+	// Add _Mat to the name of the thumbnail image
+	UTexture* selected = (UTexture *) selectedAssets[0].GetAsset();
+	FString selectedName = selectedAssets[0].AssetName.ToString();
+	selectedName += "_Mat";
+
+	// Create the new material instance
+	UMaterialInstanceConstantFactoryNew* Factory = NewObject<UMaterialInstanceConstantFactoryNew>();
+	Factory->InitialParent = CastChecked<UMaterialInterface>(TheMaterial);
+	UObject* NewAsset = AssetToolsModule.Get().CreateAsset(selectedName, FPackageName::GetLongPackagePath(PackageName), UMaterialInstanceConstant::StaticClass(), Factory);
+	// Set the texture parameter to be the selected texture
+	UMaterialInstanceConstant *newlyCreatedMaterial = (UMaterialInstanceConstant *)NewAsset;
+	newlyCreatedMaterial->SetTextureParameterValueEditorOnly("ThumbTexture", selected);
 }
 
 
