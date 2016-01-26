@@ -3,6 +3,9 @@
 #include "ContentBrowserModule.h"
 //#include "Engine/EngineTypes.h"
 
+#undef WITH_EDITORONLY_DATA
+#define WITH_EDITORONLY_DATA 1
+
 IMPLEMENT_MODULE( NewMenuEditorModule, NewMenu );
 
 void NewMenuEditorModule::StartupModule()
@@ -24,6 +27,11 @@ void NewMenuEditorModule::CreateNewMenu()
 										NULL,
 										FMenuBarExtensionDelegate::CreateStatic( &NewMenuEditorModule::OnCreateNewMenu ) );
 
+	MainMenuExtender->AddMenuBarExtension( "Help",
+		EExtensionHook::After,
+		NULL,
+		FMenuBarExtensionDelegate::CreateStatic(&NewMenuEditorModule::OnCreateNewMenu2));
+
 	LevelEditorModule.GetMenuExtensibilityManager()->AddExtender( MainMenuExtender );
 }
 
@@ -35,7 +43,10 @@ void NewMenuEditorModule::OnCreateNewMenu( FMenuBarBuilder& InMenuBarBuilder )
 		LOCTEXT( "NewMenuEditorTooltip", "Generate a new thumbnail material from the selected texture." ),
 		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::createThumbnailMaterialInstance)
 	);
+}
 
+void NewMenuEditorModule::OnCreateNewMenu2(FMenuBarBuilder& InMenuBarBuilder)
+{
 	InMenuBarBuilder.AddPullDownMenu
 	(
 		LOCTEXT("NewMenuEditor", "Material Color Change"),
@@ -43,7 +54,6 @@ void NewMenuEditorModule::OnCreateNewMenu( FMenuBarBuilder& InMenuBarBuilder )
 		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::colorChangeMaterial)
 	);
 }
-
 
 void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 {
@@ -59,7 +69,53 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 	// Get the selected material
 	UMaterial* selected = (UMaterial *)selectedAssets[0].GetAsset();
 
+	TArray<class UMaterialExpression*> *expressions = &selected->Expressions;
 
+	if (expressions->Num() == 0)
+	{
+		return;
+	}
+
+	//UMaterialExpressionTextureSampleParameter2D* UnrealTextureExpression =
+	//	NewObject<UMaterialExpressionTextureSampleParameter2D>(UnrealMaterial);
+
+	//UMaterialExpressionMaterialFunctionCall *newFunctionExpression;
+
+	FColorMaterialInput baseColor = selected->BaseColor;
+	UMaterialExpression *colorExpression = baseColor.Expression;
+
+	// Get the color change material function
+	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
+	UMaterialFunction *materialFunction = LoadObject<UMaterialFunction>(NULL, TEXT("/Game/FirstPerson/Materials/Functions/ApplyColorChange.ApplyColorChange"), NULL, LOAD_None, NULL);
+
+	for (int expressionIndex = 0; expressionIndex < expressions->Num(); expressionIndex++)
+	{
+		UMaterialExpression *expression = (*expressions)[expressionIndex];
+		FName name = expression->GetFName();
+		UE_LOG(LogTemp, Warning, TEXT("EXP Name: %s"), *(name.ToString()));
+		
+		if (expression == colorExpression)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("The color input expression yo yo yo"));
+		}
+
+		// Print the inputs of the expression
+		TArray<FExpressionInput*> inputs = expression->GetInputs();
+		for (int inputIndex = 0; inputIndex < inputs.Num(); inputIndex++)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Input name: %s"), *inputs[inputIndex]->InputName);
+		}
+
+		// Print the outputs of the expression
+		TArray<FExpressionOutput> outputs = expression->GetOutputs();
+		for (int outputIndex = 0; outputIndex < outputs.Num(); outputIndex++)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Output name: %s"), *outputs[outputIndex].OutputName);
+		}
+	}
+
+	
+	UE_LOG(LogTemp, Warning, TEXT("Expressisons found!!!"));
 }
 
 void NewMenuEditorModule::createThumbnailMaterialInstance(FMenuBuilder& InMenuBarBuilder)
