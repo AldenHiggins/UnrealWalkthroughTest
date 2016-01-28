@@ -17,7 +17,8 @@ public class NewMenu : ModuleRules
                 "SlateCore",
                 "ImageWrapper",
                 "AssetTools",
-                "ContentBrowser"
+                "ContentBrowser",
+                "MaterialEditor"
             }
 		);
 		//Private Paths

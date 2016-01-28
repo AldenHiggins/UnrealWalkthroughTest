@@ -1,7 +1,9 @@
 #include "NewMenuEditorModule.h"
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
-//#include "Engine/EngineTypes.h"
+#include "Materials/MaterialExpressionScalarParameter.h"
+#include "Editor/MaterialEditor/Public/IMaterialEditor.h"
+#include "Toolkits/ToolkitManager.h"
 
 #undef WITH_EDITORONLY_DATA
 #define WITH_EDITORONLY_DATA 1
@@ -85,10 +87,32 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 	UMaterialFunction *materialFunction = LoadObject<UMaterialFunction>(NULL, TEXT("/Game/FirstPerson/Materials/Functions/ApplyColorChange.ApplyColorChange"), NULL, LOAD_None, NULL);
 	// Create the color change expression
 	UMaterialExpressionMaterialFunctionCall* newFunctionCall = NewObject<UMaterialExpressionMaterialFunctionCall>(selected);
-	newFunctionCall->MaterialExpressionEditorX = 200;
+	newFunctionCall->MaterialExpressionEditorX = 400;
 	newFunctionCall->MaterialExpressionEditorY = 0;
 	newFunctionCall->MaterialFunction = materialFunction;
 	expressions->Add(newFunctionCall);
+
+	// Create the scalar parameters for the material
+	UMaterialExpressionScalarParameter *uCoordinateScalar = NewObject<UMaterialExpressionScalarParameter>((UObject *)selected, UMaterialExpressionScalarParameter::StaticClass(), NAME_None, RF_Transactional);
+	uCoordinateScalar->MaterialExpressionEditorX = 200;
+	uCoordinateScalar->MaterialExpressionEditorY = 0;
+	uCoordinateScalar->ParameterName = "ColorWheelU";
+	selected->Expressions.Add(uCoordinateScalar);
+
+	UMaterialExpressionScalarParameter *vCoordinateScalar = NewObject<UMaterialExpressionScalarParameter>((UObject *)selected, UMaterialExpressionScalarParameter::StaticClass(), NAME_None, RF_Transactional);
+	vCoordinateScalar->MaterialExpressionEditorX = 200;
+	vCoordinateScalar->MaterialExpressionEditorY = 200;
+	vCoordinateScalar->ParameterName = "ColorWheelV";
+	selected->Expressions.Add(vCoordinateScalar);
+
+	UMaterialExpressionScalarParameter *colorBlendScalar = NewObject<UMaterialExpressionScalarParameter>((UObject *)selected, UMaterialExpressionScalarParameter::StaticClass(), NAME_None, RF_Transactional);
+	colorBlendScalar->MaterialExpressionEditorX = 200;
+	colorBlendScalar->MaterialExpressionEditorY = 400;
+	colorBlendScalar->ParameterName = "ColorBlendAlpha";
+	selected->Expressions.Add(colorBlendScalar);
+
+
+	colorBlendScalar
 
 	for (int expressionIndex = 0; expressionIndex < expressions->Num(); expressionIndex++)
 	{
