@@ -82,16 +82,6 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 	FColorMaterialInput baseColor = selected->BaseColor;
 	UMaterialExpression *colorExpression = baseColor.Expression;
 
-	// Get the color change material function
-	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
-	UMaterialFunction *materialFunction = LoadObject<UMaterialFunction>(NULL, TEXT("/Game/FirstPerson/Materials/Functions/ApplyColorChange.ApplyColorChange"), NULL, LOAD_None, NULL);
-	// Create the color change expression
-	UMaterialExpressionMaterialFunctionCall* newFunctionCall = NewObject<UMaterialExpressionMaterialFunctionCall>(selected);
-	newFunctionCall->MaterialExpressionEditorX = 400;
-	newFunctionCall->MaterialExpressionEditorY = 0;
-	newFunctionCall->MaterialFunction = materialFunction;
-	expressions->Add(newFunctionCall);
-
 	// Create the scalar parameters for the material
 	UMaterialExpressionScalarParameter *uCoordinateScalar = NewObject<UMaterialExpressionScalarParameter>((UObject *)selected, UMaterialExpressionScalarParameter::StaticClass(), NAME_None, RF_Transactional);
 	uCoordinateScalar->MaterialExpressionEditorX = 200;
@@ -111,8 +101,22 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 	colorBlendScalar->ParameterName = "ColorBlendAlpha";
 	selected->Expressions.Add(colorBlendScalar);
 
+	// Get the color change material function
+	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
+	UMaterialFunction *materialFunction = LoadObject<UMaterialFunction>(NULL, TEXT("/Game/FirstPerson/Materials/Functions/ApplyColorChange.ApplyColorChange"), NULL, LOAD_None, NULL);
+	// Create the color change expression
+	UMaterialExpressionMaterialFunctionCall* newFunctionCall = NewObject<UMaterialExpressionMaterialFunctionCall>(selected);
+	newFunctionCall->MaterialExpressionEditorX = 400;
+	newFunctionCall->MaterialExpressionEditorY = 0;
+	newFunctionCall->MaterialFunction = materialFunction;
+	newFunctionCall->UpdateFromFunctionResource();
+	expressions->Add(newFunctionCall);
 
-	colorBlendScalar
+	// Set the function inputs to the newly created parameters
+	TArray<struct FFunctionExpressionInput> *functionInputs = &(newFunctionCall->FunctionInputs);
+	vCoordinateScalar->ConnectExpression(&(*functionInputs)[0].Input, 0);
+	uCoordinateScalar->ConnectExpression(&(*functionInputs)[3].Input, 0);
+	colorBlendScalar->ConnectExpression(&(*functionInputs)[1].Input, 0);
 
 	for (int expressionIndex = 0; expressionIndex < expressions->Num(); expressionIndex++)
 	{
