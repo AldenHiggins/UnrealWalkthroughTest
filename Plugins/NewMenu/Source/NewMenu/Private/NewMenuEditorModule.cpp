@@ -116,7 +116,10 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 	TArray<struct FFunctionExpressionInput> *functionInputs = &(newFunctionCall->FunctionInputs);
 	vCoordinateScalar->ConnectExpression(&(*functionInputs)[0].Input, 0);
 	uCoordinateScalar->ConnectExpression(&(*functionInputs)[3].Input, 0);
+	colorExpression->ConnectExpression(&(*functionInputs)[2].Input, 0);
 	colorBlendScalar->ConnectExpression(&(*functionInputs)[1].Input, 0);
+
+	selected->BaseColor.Expression = newFunctionCall;
 
 	for (int expressionIndex = 0; expressionIndex < expressions->Num(); expressionIndex++)
 	{
