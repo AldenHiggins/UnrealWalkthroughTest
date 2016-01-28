@@ -57,10 +57,11 @@ void NewMenuEditorModule::OnCreateNewMenu2(FMenuBarBuilder& InMenuBarBuilder)
 
 void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 {
+	// Get the selected asset from the content browser
 	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
 	TArray<FAssetData> selectedAssets;
 	ContentBrowserModule.Get().GetSelectedAssets(selectedAssets);
-
+	// Exit out if the user hasn't selected anything
 	if (selectedAssets.Num() == 0)
 	{
 		return;
@@ -68,18 +69,13 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 
 	// Get the selected material
 	UMaterial* selected = (UMaterial *)selectedAssets[0].GetAsset();
-
+	// Get the material expressions
 	TArray<class UMaterialExpression*> *expressions = &selected->Expressions;
-
+	// Exit out if no expressions can be found
 	if (expressions->Num() == 0)
 	{
 		return;
 	}
-
-	//UMaterialExpressionTextureSampleParameter2D* UnrealTextureExpression =
-	//	NewObject<UMaterialExpressionTextureSampleParameter2D>(UnrealMaterial);
-
-	//UMaterialExpressionMaterialFunctionCall *newFunctionExpression;
 
 	FColorMaterialInput baseColor = selected->BaseColor;
 	UMaterialExpression *colorExpression = baseColor.Expression;
@@ -87,6 +83,12 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 	// Get the color change material function
 	FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
 	UMaterialFunction *materialFunction = LoadObject<UMaterialFunction>(NULL, TEXT("/Game/FirstPerson/Materials/Functions/ApplyColorChange.ApplyColorChange"), NULL, LOAD_None, NULL);
+	// Create the color change expression
+	UMaterialExpressionMaterialFunctionCall* newFunctionCall = NewObject<UMaterialExpressionMaterialFunctionCall>(selected);
+	newFunctionCall->MaterialExpressionEditorX = 200;
+	newFunctionCall->MaterialExpressionEditorY = 0;
+	newFunctionCall->MaterialFunction = materialFunction;
+	expressions->Add(newFunctionCall);
 
 	for (int expressionIndex = 0; expressionIndex < expressions->Num(); expressionIndex++)
 	{
