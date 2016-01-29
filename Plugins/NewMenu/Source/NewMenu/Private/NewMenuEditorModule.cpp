@@ -121,32 +121,8 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 
 	selected->BaseColor.Expression = newFunctionCall;
 
-	for (int expressionIndex = 0; expressionIndex < expressions->Num(); expressionIndex++)
-	{
-		UMaterialExpression *expression = (*expressions)[expressionIndex];
-		FName name = expression->GetFName();
-		UE_LOG(LogTemp, Warning, TEXT("EXP Name: %s"), *(name.ToString()));
-		
-		if (expression == colorExpression)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("The color input expression yo yo yo"));
-		}
-
-		// Print the inputs of the expression
-		TArray<FExpressionInput*> inputs = expression->GetInputs();
-		for (int inputIndex = 0; inputIndex < inputs.Num(); inputIndex++)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Input name: %s"), *inputs[inputIndex]->InputName);
-		}
-
-		// Print the outputs of the expression
-		TArray<FExpressionOutput> outputs = expression->GetOutputs();
-		for (int outputIndex = 0; outputIndex < outputs.Num(); outputIndex++)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Output name: %s"), *outputs[outputIndex].OutputName);
-		}
-	}
-
+	// Compile the material
+	selected->ForceRecompileForRendering();
 	
 	UE_LOG(LogTemp, Warning, TEXT("Expressisons found!!!"));
 }
