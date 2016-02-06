@@ -5,6 +5,12 @@
 #include "WalkthroughTestProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/InputSettings.h"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include <string>
+#include <iostream>
+#include <fstream>
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -33,6 +39,9 @@ void AWalkthroughTestCharacter::SetupPlayerInputComponent(class UInputComponent*
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	InputComponent->BindAction("DPAD_LEFT", IE_Pressed, this, &AWalkthroughTestCharacter::saveLevelToJson);
+	InputComponent->BindAction("DPAD_RIGHT", IE_Pressed, this, &AWalkthroughTestCharacter::loadLevelFromJson);
 	
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AWalkthroughTestCharacter::TouchStarted);
 	if( EnableTouchscreenMovement(InputComponent) == false )
@@ -151,4 +160,22 @@ bool AWalkthroughTestCharacter::EnableTouchscreenMovement(class UInputComponent*
 		InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AWalkthroughTestCharacter::TouchUpdate);
 	}
 	return bResult;
+}
+
+void AWalkthroughTestCharacter::saveLevelToJson()
+{
+	UE_LOG(LogTemp, Warning, TEXT("JSON SAVE!!!"));
+
+	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+	rapidjson::Document d;
+	d.Parse(json);
+
+}
+
+void AWalkthroughTestCharacter::loadLevelFromJson()
+{
+	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD!!!"));
+
+
+	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished!!!"));
 }

@@ -60,6 +60,9 @@ protected:
 	void EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
+
+	void saveLevelToJson();
+	void loadLevelFromJson();
 	
 protected:
 	// APawn interface
