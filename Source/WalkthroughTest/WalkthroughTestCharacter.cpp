@@ -174,12 +174,30 @@ void AWalkthroughTestCharacter::saveLevelToJson()
 		return;
 	}
 
-	FString name(placedFurniture[0]->GetClass()->GetName());
-	name.RemoveFromEnd("_C");
-	FString theDude("{\"project\":\"" + name + "\"}");
-	//char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
-	char* json = TCHAR_TO_ANSI(*theDude);
+	// Generate a json string that contains all of the placed furniture
+	FString furnitureJsonString;
+	furnitureJsonString += "{";
+	for (int furnitureIndex = 0; furnitureIndex < placedFurniture.Num(); furnitureIndex++)
+	{
+		FString name(placedFurniture[furnitureIndex]->GetClass()->GetName());
+		name.RemoveFromEnd("_C");
+		furnitureJsonString += "\"" + FString::FromInt(furnitureIndex) + "\":\"" + name + "\"";
+
+		if (furnitureIndex == placedFurniture.Num() - 1)
+		{
+			furnitureJsonString += "}";
+		}
+		else
+		{
+			furnitureJsonString += ',';
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Json string to write: %s"), *furnitureJsonString);
+
+	// Write the json string onto a document
 	rapidjson::Document d;
+	char* json = TCHAR_TO_ANSI(*furnitureJsonString);
 	d.Parse(json);
 
 	// Write the json object to a file
@@ -201,24 +219,38 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 	rapidjson::Document d;
 	d.ParseStream(is);
 	fclose(fp);
-	// Print out the json object
-	const char *project = d["project"].GetString();
-	FString projectName(project);
 
-	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished: %s"), *projectName);	
+	for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr)
+	{
+		FString theName(d[itr->name.GetString()].GetString());
+		UE_LOG(LogTemp, Warning, TEXT("Member name: %s"), *theName);
 
-	//FString blueprintName("ShortChair_Blueprint");
-	FString fullBlueprintName = "Blueprint'/Game/FirstPerson/Blueprints/Furniture/" + projectName + "." + projectName + "'";
-	//FStringAssetReference itemRef("Blueprint'/Game/FirstPerson/Blueprints/Furniture/BigCouch_Blueprint.BigCouch_Blueprint'");
-	FStringAssetReference itemRef(fullBlueprintName);
+		FString fullBlueprintName = "Blueprint'/Game/FirstPerson/Blueprints/Furniture/" + theName + "." + theName + "'";
+		FStringAssetReference itemRef(fullBlueprintName);
+		UObject* itemObj = itemRef.ResolveObject();
+		UBlueprint* gen = Cast<UBlueprint>(itemObj);
+		FVector NewLocation = FVector(1200.f, 410.f, -10.f);
+		AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
+	}
 
-	UObject* itemObj = itemRef.ResolveObject();
+	//// Print out the json object
+	//const char *project = d["project"].GetString();
+	//FString projectName(project);
 
-	UBlueprint* gen = Cast<UBlueprint>(itemObj);
+	//UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished: %s"), *projectName);	
 
-	FVector NewLocation = FVector(1200.f, 410.f, -10.f);
+	////FString blueprintName("ShortChair_Blueprint");
+	//FString fullBlueprintName = "Blueprint'/Game/FirstPerson/Blueprints/Furniture/" + projectName + "." + projectName + "'";
+	////FStringAssetReference itemRef("Blueprint'/Game/FirstPerson/Blueprints/Furniture/BigCouch_Blueprint.BigCouch_Blueprint'");
+	//FStringAssetReference itemRef(fullBlueprintName);
 
-	AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
+	//UObject* itemObj = itemRef.ResolveObject();
+
+	//UBlueprint* gen = Cast<UBlueprint>(itemObj);
+
+	//FVector NewLocation = FVector(1200.f, 410.f, -10.f);
+
+	//AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
 }
 
 void AWalkthroughTestCharacter::AddObjectToFurnitureList(AActor *newFurniture)
