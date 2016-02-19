@@ -8,9 +8,12 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/filereadstream.h"
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -170,12 +173,28 @@ void AWalkthroughTestCharacter::saveLevelToJson()
 	rapidjson::Document d;
 	d.Parse(json);
 
+	// Write the json object to a file
+	FILE* fp = fopen("D:/AldenHiggins/Projects/WalkthroughTest/Content/FirstPerson/SavedLevels/output.json", "wb"); // non-Windows use "w"
+	char writeBuffer[65536];
+	rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	rapidjson::Writer<rapidjson::FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
 }
 
 void AWalkthroughTestCharacter::loadLevelFromJson()
 {
 	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD!!!"));
+	// Read in the json object
+	FILE* fp = fopen("D:/AldenHiggins/Projects/WalkthroughTest/Content/FirstPerson/SavedLevels/output.json", "rb"); // non-Windows use "r"
+	char readBuffer[65536];
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
+	d.ParseStream(is);
+	fclose(fp);
+	// Print out the json object
+	const char *project = d["project"].GetString();
+	FString projectName(project);
 
-
-	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished!!!"));
+	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished: %s"), *projectName);
 }
