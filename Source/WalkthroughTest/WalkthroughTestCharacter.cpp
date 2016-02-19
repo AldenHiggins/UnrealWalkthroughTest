@@ -168,8 +168,17 @@ bool AWalkthroughTestCharacter::EnableTouchscreenMovement(class UInputComponent*
 void AWalkthroughTestCharacter::saveLevelToJson()
 {
 	UE_LOG(LogTemp, Warning, TEXT("JSON SAVE!!!"));
+	// Only try to save the level if there's some furniture to save, ya dingus
+	if (placedFurniture.Num() == 0)
+	{
+		return;
+	}
 
-	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+	FString name(placedFurniture[0]->GetClass()->GetName());
+	name.RemoveFromEnd("_C");
+	FString theDude("{\"project\":\"" + name + "\"}");
+	//char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+	char* json = TCHAR_TO_ANSI(*theDude);
 	rapidjson::Document d;
 	d.Parse(json);
 
@@ -210,6 +219,12 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 	FVector NewLocation = FVector(1200.f, 410.f, -10.f);
 
 	AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
+}
+
+void AWalkthroughTestCharacter::AddObjectToFurnitureList(AActor *newFurniture)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Added onto this foo!"));
+	placedFurniture.Add(newFurniture);
 }
 
 

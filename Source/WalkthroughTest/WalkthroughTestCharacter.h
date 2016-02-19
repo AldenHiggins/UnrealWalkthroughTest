@@ -28,7 +28,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	float MoveSpeed;
 
+	UFUNCTION(BlueprintCallable, Category = "Kilograph")
+	void AddObjectToFurnitureList(AActor *newFurniture);
+
 protected:
+	TArray<AActor *> placedFurniture;
+
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
