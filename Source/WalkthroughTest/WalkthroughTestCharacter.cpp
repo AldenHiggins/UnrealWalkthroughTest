@@ -196,5 +196,20 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 	const char *project = d["project"].GetString();
 	FString projectName(project);
 
-	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished: %s"), *projectName);
+	UE_LOG(LogTemp, Warning, TEXT("JSON LOAD finished: %s"), *projectName);	
+
+	//FString blueprintName("ShortChair_Blueprint");
+	FString fullBlueprintName = "Blueprint'/Game/FirstPerson/Blueprints/Furniture/" + projectName + "." + projectName + "'";
+	//FStringAssetReference itemRef("Blueprint'/Game/FirstPerson/Blueprints/Furniture/BigCouch_Blueprint.BigCouch_Blueprint'");
+	FStringAssetReference itemRef(fullBlueprintName);
+
+	UObject* itemObj = itemRef.ResolveObject();
+
+	UBlueprint* gen = Cast<UBlueprint>(itemObj);
+
+	FVector NewLocation = FVector(1200.f, 410.f, -10.f);
+
+	AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
 }
+
+
