@@ -301,7 +301,17 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 			UE_LOG(LogTemp, Warning, TEXT("Component name: %s"), *components[componentIndex]->GetName());
 			if (componentName == "InteractiveObject")
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Interactive found!!!"));
+				FString fieldName("MaterialColorAlpha");
+				UFloatProperty* MyFloatProp = FindField<UFloatProperty>(components[componentIndex]->GetClass(), *fieldName);
+				if (MyFloatProp != NULL)
+				{
+					float FloatVal = MyFloatProp->GetPropertyValue_InContainer(components[componentIndex]);
+					MyFloatProp->SetPropertyValue_InContainer(components[componentIndex], 0.0f);
+					UE_LOG(LogTemp, Warning, TEXT("Alpha val: %f"), FloatVal);
+
+					//MyFloatProp->SetPropertyValue_InContainer(item, 180.0f);
+					//FloatVal = MyFloatProp->GetPropertyValue_InContainer(item);
+				}
 			}
 		}
 
