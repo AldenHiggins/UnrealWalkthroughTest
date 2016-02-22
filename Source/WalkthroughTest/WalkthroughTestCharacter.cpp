@@ -11,6 +11,7 @@
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/error/en.h"
+#include "Runtime/CoreUObject/Public/UObject/UnrealType.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -280,6 +281,42 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 		FVector NewLocation = FVector(1200.f, 410.f, -10.f);
 		AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
 
+		
+
+		//UFloatProperty* FloatProp = FindField<UFloatProperty>(item->GetClass(), *fieldName);
+		//if (FloatProp != NULL)
+		//{
+		//	//GetFloatingPointPropertyValue
+		//	//float* FloatPtr = FloatProp->GetPropertyValue_InContainer(item);
+		//	double FloatPtr = FloatProp->GetFloatingPointPropertyValue(item);
+
+		//	UE_LOG(LogTemp, Warning, TEXT("Alpha val: %f"), FloatPtr);
+
+		//}
+
+		TArray<UActorComponent *> components = item->GetComponents();
+		for (int componentIndex = 0; componentIndex < components.Num(); componentIndex++)
+		{
+			FString componentName = components[componentIndex]->GetName();
+			UE_LOG(LogTemp, Warning, TEXT("Component name: %s"), *components[componentIndex]->GetName());
+			if (componentName == "InteractiveObject")
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Interactive found!!!"));
+			}
+		}
+
+		FString fieldName("MaterialColorAlpha");
+		UFloatProperty* MyFloatProp = FindField<UFloatProperty>((UClass *)gen->GeneratedClass, *fieldName);
+		if (MyFloatProp != NULL)
+		{
+			float FloatVal = MyFloatProp->GetPropertyValue_InContainer(item);
+			UE_LOG(LogTemp, Warning, TEXT("Alpha val: %f"), FloatVal);
+
+			//MyFloatProp->SetPropertyValue_InContainer(item, 180.0f);
+			//FloatVal = MyFloatProp->GetPropertyValue_InContainer(item);
+		}
+		
+
 		// Place it in the correct location
 		const rapidjson::Value& furnitureInfoArray = d[itr->name.GetString()]["Position"];
 		assert(furnitureInfoArray.IsArray());
@@ -311,7 +348,6 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 
 void AWalkthroughTestCharacter::AddObjectToFurnitureList(AActor *newFurniture)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Adding to furniture array!"));
 	placedFurniture.Add(newFurniture);
 }
 
