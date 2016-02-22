@@ -182,8 +182,26 @@ void AWalkthroughTestCharacter::saveLevelToJson()
 	{
 		FString name(placedFurniture[furnitureIndex]->GetClass()->GetName());
 		name.RemoveFromEnd("_C");
-		furnitureJsonString += "\"" + name + "\":";
+		// Save the piece of furniture under the index it appears in the furniture array
+		furnitureJsonString += "\"" + FString::FromInt(furnitureIndex) + "\":";
 
+		// Save the name of the furniture
+		furnitureJsonString += "{";
+		furnitureJsonString += "\"";
+		furnitureJsonString += "Name";
+		furnitureJsonString += "\"";
+		furnitureJsonString += ":";
+
+		furnitureJsonString += "\"";
+		furnitureJsonString += name;
+		furnitureJsonString += "\"";
+		furnitureJsonString += ", ";
+
+		// Save the position of the furniture
+		furnitureJsonString += "\"";
+		furnitureJsonString += "Position";
+		furnitureJsonString += "\"";
+		furnitureJsonString += ":";
 		furnitureJsonString += "[";
 		furnitureJsonString += FString::SanitizeFloat(placedFurniture[furnitureIndex]->GetActorLocation().X);
 		furnitureJsonString += ", ";
@@ -191,6 +209,8 @@ void AWalkthroughTestCharacter::saveLevelToJson()
 		furnitureJsonString += ", ";
 		furnitureJsonString += FString::SanitizeFloat(placedFurniture[furnitureIndex]->GetActorLocation().Z);
 		furnitureJsonString += "]";
+
+		furnitureJsonString += "}";
 
 		if (furnitureIndex == placedFurniture.Num() - 1)
 		{
@@ -238,9 +258,7 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 	for (rapidjson::Value::ConstMemberIterator itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr)
 	{
 		// Spawn the piece of furniture
-		FString furnitureBlueprintName(itr->name.GetString());
-		UE_LOG(LogTemp, Warning, TEXT("Member value: %s"), *furnitureBlueprintName);
-
+		FString furnitureBlueprintName(d[itr->name.GetString()]["Name"].GetString());
 		FString fullBlueprintName = "Blueprint'/Game/FirstPerson/Blueprints/Furniture/" + furnitureBlueprintName + "." + furnitureBlueprintName + "'";
 		FStringAssetReference itemRef(fullBlueprintName);
 		UObject* itemObj = itemRef.ResolveObject();
@@ -249,7 +267,7 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 		AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
 
 		// Place it in the correct location
-		const rapidjson::Value& furnitureInfoArray = d[itr->name.GetString()];
+		const rapidjson::Value& furnitureInfoArray = d[itr->name.GetString()]["Position"];
 		assert(furnitureInfoArray.IsArray());
 		if (furnitureInfoArray.Size() >= 3)
 		{
