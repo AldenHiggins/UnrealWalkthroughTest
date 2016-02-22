@@ -209,6 +209,20 @@ void AWalkthroughTestCharacter::saveLevelToJson()
 		furnitureJsonString += ", ";
 		furnitureJsonString += FString::SanitizeFloat(placedFurniture[furnitureIndex]->GetActorLocation().Z);
 		furnitureJsonString += "]";
+		furnitureJsonString += ", ";
+
+		// Save the rotation of the furniture
+		furnitureJsonString += "\"";
+		furnitureJsonString += "Rotation";
+		furnitureJsonString += "\"";
+		furnitureJsonString += ":";
+		furnitureJsonString += "[";
+		furnitureJsonString += FString::SanitizeFloat(placedFurniture[furnitureIndex]->GetActorRotation().Euler().X);
+		furnitureJsonString += ", ";
+		furnitureJsonString += FString::SanitizeFloat(placedFurniture[furnitureIndex]->GetActorRotation().Euler().Y);
+		furnitureJsonString += ", ";
+		furnitureJsonString += FString::SanitizeFloat(placedFurniture[furnitureIndex]->GetActorRotation().Euler().Z);
+		furnitureJsonString += "]";
 
 		furnitureJsonString += "}";
 
@@ -274,6 +288,15 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 			FVector position(furnitureInfoArray[0].GetDouble(), furnitureInfoArray[1].GetDouble(), furnitureInfoArray[2].GetDouble());
 			item->SetActorLocation(position);
 		}
+
+		// Rotate the furniture
+		const rapidjson::Value& rotationInfo = d[itr->name.GetString()]["Rotation"];
+		assert(furnitureInfoArray.IsArray());
+		if (furnitureInfoArray.Size() >= 3)
+		{
+			FRotator rotation = FRotator::MakeFromEuler(FVector(rotationInfo[0].GetDouble(), rotationInfo[1].GetDouble(), rotationInfo[2].GetDouble()));
+			item->SetActorRotation(rotation);
+		}
 		//for (rapidjson::SizeType i = 0; i < furnitureInfoArray.Size(); i++)
 		//{
 		//	double printThis = furnitureInfoArray[i].GetDouble();
@@ -284,7 +307,7 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 
 void AWalkthroughTestCharacter::AddObjectToFurnitureList(AActor *newFurniture)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Added onto this foo!"));
+	UE_LOG(LogTemp, Warning, TEXT("Adding to furniture array!"));
 	placedFurniture.Add(newFurniture);
 }
 
