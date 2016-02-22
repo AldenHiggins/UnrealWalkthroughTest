@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Kilograph")
 	void AddObjectToFurnitureList(AActor *newFurniture);
 
+	UFUNCTION(BlueprintCallable, Category = "Kilograph")
+	void RemoveObjectFromFurnitureList(AActor *removeThis);
+
 protected:
 	TArray<AActor *> placedFurniture;
 

@@ -297,6 +297,10 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 			FRotator rotation = FRotator::MakeFromEuler(FVector(rotationInfo[0].GetDouble(), rotationInfo[1].GetDouble(), rotationInfo[2].GetDouble()));
 			item->SetActorRotation(rotation);
 		}
+
+		// Add the spawned furniture to placedfurniture
+		placedFurniture.Add(item);
+
 		//for (rapidjson::SizeType i = 0; i < furnitureInfoArray.Size(); i++)
 		//{
 		//	double printThis = furnitureInfoArray[i].GetDouble();
@@ -309,6 +313,11 @@ void AWalkthroughTestCharacter::AddObjectToFurnitureList(AActor *newFurniture)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Adding to furniture array!"));
 	placedFurniture.Add(newFurniture);
+}
+
+void AWalkthroughTestCharacter::RemoveObjectFromFurnitureList(AActor *removeThis)
+{
+	placedFurniture.Remove(removeThis);
 }
 
 
