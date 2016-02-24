@@ -34,15 +34,36 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Kilograph")
 	void RemoveObjectFromFurnitureList(AActor *removeThis);
 
+	UFUNCTION(BlueprintCallable, Category = "Kilograph")
+	void setMenu(AActor *newMenu);
+
+	UFUNCTION(BlueprintCallable, Category = "Kilograph")
+	void setMenuItems(TArray<AActor*>newMenuItems);
+
+	UFUNCTION(BlueprintCallable, Category = "Kilograph")
+	void setMenuOffset(FVector menuOffset);
+
+	UFUNCTION(BlueprintCallable, Category = "Kilograph")
+	void repositionMenu();
+
 protected:
-	TArray<AActor *> placedFurniture;
+	// Array of placed furniture in the level used to save the level configuration
+	TArray<AActor*> placedFurniture;
+
+	// Array of 3D menu items to be moved alongside the menu
+	TArray<AActor*> menuItems;
+
+	// 3D Menu that the user brings up
+	AActor *menu;
+
+	// 3D Menu's offset from the player
+	FVector menuOffset;
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
-
 
 	/**
 	 * Called via input to turn at a given rate.

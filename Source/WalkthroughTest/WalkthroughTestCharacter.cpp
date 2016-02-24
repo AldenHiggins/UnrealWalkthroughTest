@@ -329,4 +329,22 @@ void AWalkthroughTestCharacter::RemoveObjectFromFurnitureList(AActor *removeThis
 	placedFurniture.Remove(removeThis);
 }
 
+void AWalkthroughTestCharacter::setMenu(AActor *newMenu)
+{
+	menu = newMenu;
+}
 
+void AWalkthroughTestCharacter::setMenuItems(TArray<AActor*>newMenuItems)
+{
+	menuItems = newMenuItems;
+}
+
+void AWalkthroughTestCharacter::setMenuOffset(FVector menuOffsetInput)
+{
+	menuOffset = menuOffsetInput;
+}
+
+void AWalkthroughTestCharacter::repositionMenu()
+{
+	menu->SetActorLocation(GetActorLocation() + menuOffset);
+}
