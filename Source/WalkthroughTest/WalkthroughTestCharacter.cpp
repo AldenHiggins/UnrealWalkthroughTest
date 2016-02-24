@@ -281,78 +281,41 @@ void AWalkthroughTestCharacter::loadLevelFromJson()
 		FVector NewLocation = FVector(1200.f, 410.f, -10.f);
 		AActor* item = GetWorld()->SpawnActor<AActor>(gen->GeneratedClass, NewLocation, FRotator::ZeroRotator);
 
-		
-
-		//UFloatProperty* FloatProp = FindField<UFloatProperty>(item->GetClass(), *fieldName);
-		//if (FloatProp != NULL)
-		//{
-		//	//GetFloatingPointPropertyValue
-		//	//float* FloatPtr = FloatProp->GetPropertyValue_InContainer(item);
-		//	double FloatPtr = FloatProp->GetFloatingPointPropertyValue(item);
-
-		//	UE_LOG(LogTemp, Warning, TEXT("Alpha val: %f"), FloatPtr);
-
-		//}
-
-		TArray<UActorComponent *> components = item->GetComponents();
-		for (int componentIndex = 0; componentIndex < components.Num(); componentIndex++)
-		{
-			FString componentName = components[componentIndex]->GetName();
-			UE_LOG(LogTemp, Warning, TEXT("Component name: %s"), *components[componentIndex]->GetName());
-			if (componentName == "InteractiveObject")
-			{
-				FString fieldName("MaterialColorAlpha");
-				UFloatProperty* MyFloatProp = FindField<UFloatProperty>(components[componentIndex]->GetClass(), *fieldName);
-				if (MyFloatProp != NULL)
-				{
-					float FloatVal = MyFloatProp->GetPropertyValue_InContainer(components[componentIndex]);
-					MyFloatProp->SetPropertyValue_InContainer(components[componentIndex], 0.0f);
-					UE_LOG(LogTemp, Warning, TEXT("Alpha val: %f"), FloatVal);
-
-					//MyFloatProp->SetPropertyValue_InContainer(item, 180.0f);
-					//FloatVal = MyFloatProp->GetPropertyValue_InContainer(item);
-				}
-			}
-		}
-
-		FString fieldName("MaterialColorAlpha");
-		UFloatProperty* MyFloatProp = FindField<UFloatProperty>((UClass *)gen->GeneratedClass, *fieldName);
-		if (MyFloatProp != NULL)
-		{
-			float FloatVal = MyFloatProp->GetPropertyValue_InContainer(item);
-			UE_LOG(LogTemp, Warning, TEXT("Alpha val: %f"), FloatVal);
-
-			//MyFloatProp->SetPropertyValue_InContainer(item, 180.0f);
-			//FloatVal = MyFloatProp->GetPropertyValue_InContainer(item);
-		}
-		
-
 		// Place it in the correct location
-		const rapidjson::Value& furnitureInfoArray = d[itr->name.GetString()]["Position"];
-		assert(furnitureInfoArray.IsArray());
-		if (furnitureInfoArray.Size() >= 3)
+		const rapidjson::Value& positionArray = d[itr->name.GetString()]["Position"];
+		if (positionArray.Size() >= 3)
 		{
-			FVector position(furnitureInfoArray[0].GetDouble(), furnitureInfoArray[1].GetDouble(), furnitureInfoArray[2].GetDouble());
+			FVector position(positionArray[0].GetDouble(), positionArray[1].GetDouble(), positionArray[2].GetDouble());
 			item->SetActorLocation(position);
 		}
 
 		// Rotate the furniture
 		const rapidjson::Value& rotationInfo = d[itr->name.GetString()]["Rotation"];
-		assert(furnitureInfoArray.IsArray());
-		if (furnitureInfoArray.Size() >= 3)
+		if (rotationInfo.Size() >= 3)
 		{
 			FRotator rotation = FRotator::MakeFromEuler(FVector(rotationInfo[0].GetDouble(), rotationInfo[1].GetDouble(), rotationInfo[2].GetDouble()));
 			item->SetActorRotation(rotation);
 		}
 
+		// Access the interactiveObject component and change the blueprint variables
+		TArray<UActorComponent *> components = item->GetComponents();
+		for (int componentIndex = 0; componentIndex < components.Num(); componentIndex++)
+		{
+			FString componentName = components[componentIndex]->GetName();
+			if (componentName == "InteractiveObject")
+			{
+				FString fieldName("InitialZ");
+				UFloatProperty* MyFloatProp = FindField<UFloatProperty>(components[componentIndex]->GetClass(), *fieldName);
+				if (MyFloatProp != NULL)
+				{
+					float FloatVal = MyFloatProp->GetPropertyValue_InContainer(components[componentIndex]);
+					MyFloatProp->SetPropertyValue_InContainer(components[componentIndex], positionArray[2].GetDouble());
+				}
+			}
+		}
+
 		// Add the spawned furniture to placedfurniture
 		placedFurniture.Add(item);
-
-		//for (rapidjson::SizeType i = 0; i < furnitureInfoArray.Size(); i++)
-		//{
-		//	double printThis = furnitureInfoArray[i].GetDouble();
-		//	UE_LOG(LogTemp, Warning, TEXT("Member value: %f"), printThis);
-		//}
 	}
 }
 
