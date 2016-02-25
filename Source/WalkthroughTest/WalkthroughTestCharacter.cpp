@@ -334,7 +334,7 @@ void AWalkthroughTestCharacter::setMenu(AActor *newMenu)
 	menu = newMenu;
 }
 
-void AWalkthroughTestCharacter::setMenuItems(TArray<AActor*>newMenuItems)
+void AWalkthroughTestCharacter::setMenuItems(TArray<AActor*> newMenuItems)
 {
 	menuItems = newMenuItems;
 }
@@ -346,5 +346,25 @@ void AWalkthroughTestCharacter::setMenuOffset(FVector menuOffsetInput)
 
 void AWalkthroughTestCharacter::repositionMenu()
 {
-	menu->SetActorLocation(GetActorLocation() + menuOffset);
+	float buttonsPerRow = 8.0f;
+	float columnStep = 32.0f;
+	float rowStep = -32.0f;
+	FVector initialButtonPosition(-115.0f, 10.0f, 20.0f);
+
+	FVector menuLocation = GetActorLocation() + menuOffset;
+	menu->SetActorLocation(menuLocation);
+
+	for (int buttonIndex = 0; buttonIndex < menuItems.Num(); buttonIndex++)
+	{
+		int rowIndex = buttonIndex / buttonsPerRow;
+		int columnIndex = buttonIndex % (int)buttonsPerRow;
+
+		FVector buttonPosition(columnIndex * columnStep, 0.0f, rowIndex * rowStep);
+		buttonPosition += initialButtonPosition;
+		buttonPosition = menu->GetActorRotation().RotateVector(buttonPosition);
+		buttonPosition += menuLocation;
+
+		menuItems[buttonIndex]->SetActorLocation(buttonPosition);
+		menuItems[buttonIndex]->SetActorRotation(menu->GetActorRotation());
+	}
 }
