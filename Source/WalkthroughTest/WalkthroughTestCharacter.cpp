@@ -346,14 +346,16 @@ void AWalkthroughTestCharacter::setMenuOffset(FVector menuOffsetInput)
 
 void AWalkthroughTestCharacter::repositionMenu()
 {
+	// TODO: Move these out to be member variables or blueprint modifiable values
 	float buttonsPerRow = 8.0f;
 	float columnStep = 32.0f;
 	float rowStep = -32.0f;
 	FVector initialButtonPosition(-115.0f, 10.0f, 20.0f);
 
+	// Set the overall menu's location at an offset from the player
 	FVector menuLocation = GetActorLocation() + menuOffset;
 	menu->SetActorLocation(menuLocation);
-
+	// Set the location of all of the menu's button as an offset from the menu location
 	for (int buttonIndex = 0; buttonIndex < menuItems.Num(); buttonIndex++)
 	{
 		int rowIndex = buttonIndex / buttonsPerRow;
