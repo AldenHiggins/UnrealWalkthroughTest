@@ -6,6 +6,6 @@ public class WalkthroughTest : ModuleRules
 {
 	public WalkthroughTest(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "HeadMountedDisplay", "OculusRift", "InputCore" });
 	}
 }

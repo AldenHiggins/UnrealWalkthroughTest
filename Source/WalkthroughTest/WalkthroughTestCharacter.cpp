@@ -12,6 +12,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/error/en.h"
 #include "Runtime/CoreUObject/Public/UObject/UnrealType.h"
+#include "../Plugins/Runtime/OculusRift/Source/OculusRift/Public/IOculusRiftPlugin.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -31,7 +32,22 @@ AWalkthroughTestCharacter::AWalkthroughTestCharacter()
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->AttachParent = GetCapsuleComponent();
 	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	FirstPersonCameraComponent->bUsePawnControlRotation = false;
+
+	//UOculusFunctionLibrary
+
+
+	///**
+	//* Turns on/off default PlayerController's behavior to follow HMD orientation/position
+	//*/
+	//UFUNCTION(BlueprintCallable, Category = "Input|OculusLibrary")
+	//	static void EnablePlayerControllerFollowHmd(bool bEnable);
+
+	///**
+	//* Returns true if PlayerController follows HMD orientation/position. False, otherwise.
+	//*/
+	//UFUNCTION(BlueprintPure, Category = "Input|OculusLibrary")
+	//	static bool IsPlayerControllerFollowHmdEnabled();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -128,8 +144,11 @@ void AWalkthroughTestCharacter::MoveForward(float Value)
 {
 	if (Value != 0.0f)
 	{
+		APlayerController* PC = Cast<APlayerController>(Controller);
+
+		//PC->PlayerCameraManager->GetActorForwardVector()
 		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), Value * MoveSpeed);
+		AddMovementInput(PC->PlayerCameraManager->GetActorForwardVector(), Value * MoveSpeed);
 	}
 }
 
@@ -137,8 +156,9 @@ void AWalkthroughTestCharacter::MoveRight(float Value)
 {
 	if (Value != 0.0f)
 	{
+		APlayerController* PC = Cast<APlayerController>(Controller);
 		// add movement in that direction
-		AddMovementInput(GetActorRightVector(), Value * MoveSpeed);
+		AddMovementInput(PC->PlayerCameraManager->GetActorRightVector(), Value * MoveSpeed);
 	}
 }
 
@@ -348,9 +368,9 @@ void AWalkthroughTestCharacter::repositionMenu()
 {
 	// TODO: Move these out to be member variables or blueprint modifiable values
 	float buttonsPerRow = 8.0f;
-	float columnStep = 32.0f;
+	float columnStep = 28.0f;
 	float rowStep = -32.0f;
-	FVector initialButtonPosition(-115.0f, 10.0f, 20.0f);
+	FVector initialButtonPosition(-105.0f, 10.0f, 20.0f);
 
 	// Set the overall menu's location at an offset from the player
 	FVector menuLocation = GetActorLocation() + menuOffset;
