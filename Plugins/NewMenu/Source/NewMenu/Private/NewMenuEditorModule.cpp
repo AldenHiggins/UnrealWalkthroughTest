@@ -51,8 +51,8 @@ void NewMenuEditorModule::OnCreateNewMenu2(FMenuBarBuilder& InMenuBarBuilder)
 {
 	InMenuBarBuilder.AddPullDownMenu
 	(
-		LOCTEXT("NewMenuEditor", "Material Color Change"),
-		LOCTEXT("NewMenuEditorTooltip", "Prepare material to have it's color changed"),
+		LOCTEXT("NewMenuEditor2", "Material Color Change"),
+		LOCTEXT("NewMenuEditorTooltip2", "Prepare material to have it's color changed"),
 		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::colorChangeMaterial)
 	);
 }
@@ -71,6 +71,11 @@ void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
 
 	// Get the selected material
 	UMaterial* selected = (UMaterial *)selectedAssets[0].GetAsset();
+
+	USkeletalMesh* SkeletalMesh = CastChecked<USkeletalMesh>(selectedAssets[0].GetAsset());
+
+	//SkeletalMesh->ThumbnailInfo->GetArchetype()/
+
 	// Get the material expressions
 	TArray<class UMaterialExpression*> *expressions = &selected->Expressions;
 	// Exit out if no expressions can be found
