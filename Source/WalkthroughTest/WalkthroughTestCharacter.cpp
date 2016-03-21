@@ -33,21 +33,6 @@ AWalkthroughTestCharacter::AWalkthroughTestCharacter()
 	FirstPersonCameraComponent->AttachParent = GetCapsuleComponent();
 	FirstPersonCameraComponent->RelativeLocation = FVector(0, 0, 64.f); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = false;
-
-	//UOculusFunctionLibrary
-
-
-	///**
-	//* Turns on/off default PlayerController's behavior to follow HMD orientation/position
-	//*/
-	//UFUNCTION(BlueprintCallable, Category = "Input|OculusLibrary")
-	//	static void EnablePlayerControllerFollowHmd(bool bEnable);
-
-	///**
-	//* Returns true if PlayerController follows HMD orientation/position. False, otherwise.
-	//*/
-	//UFUNCTION(BlueprintPure, Category = "Input|OculusLibrary")
-	//	static bool IsPlayerControllerFollowHmdEnabled();
 }
 
 //////////////////////////////////////////////////////////////////////////
