@@ -34,6 +34,11 @@ void NewMenuEditorModule::CreateNewMenu()
 		NULL,
 		FMenuBarExtensionDelegate::CreateStatic(&NewMenuEditorModule::OnCreateNewMenu2));
 
+	MainMenuExtender->AddMenuBarExtension("Help",
+		EExtensionHook::After,
+		NULL,
+		FMenuBarExtensionDelegate::CreateStatic(&NewMenuEditorModule::OnCreateNewMenu3));
+
 	LevelEditorModule.GetMenuExtensibilityManager()->AddExtender( MainMenuExtender );
 }
 
@@ -55,6 +60,16 @@ void NewMenuEditorModule::OnCreateNewMenu2(FMenuBarBuilder& InMenuBarBuilder)
 		LOCTEXT("NewMenuEditorTooltip2", "Prepare material to have it's color changed"),
 		FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::colorChangeMaterial)
 	);
+}
+
+void NewMenuEditorModule::OnCreateNewMenu3(FMenuBarBuilder& InMenuBarBuilder)
+{
+	InMenuBarBuilder.AddPullDownMenu
+		(
+			LOCTEXT("NewMenuEditor3", "Create interactive object"),
+			LOCTEXT("NewMenuEditorTooltip3", "Prepare material to have it's color changed"),
+			FNewMenuDelegate::CreateStatic(&NewMenuEditorModule::colorChangeMaterial)
+			);
 }
 
 void NewMenuEditorModule::colorChangeMaterial(FMenuBuilder& InMenuBarBuilder)
